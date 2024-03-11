@@ -23,10 +23,6 @@ public class ErrorHandler {
         this.httpServletRequest = httpServletRequest;
     }
 
-    @ExceptionHandler(Throwable.class)
-    public ResponseEntity<ApiErrorResponse> handle(Throwable ex) {
-        return buildResponseError(HttpStatus.INTERNAL_SERVER_ERROR, ex);
-    }
 
     private ResponseEntity<ApiErrorResponse> buildResponseError(HttpStatus httpStatus, Throwable ex) {
 
@@ -34,10 +30,8 @@ public class ErrorHandler {
         return new ResponseEntity<>(apiErrorResponse, httpStatus);
     }
 
-    @ExceptionHandler({
-            UsuarioException.class,
-    })
-    public ResponseEntity<ApiErrorResponse> handle(GenericExcepcion ex) {
+    @ExceptionHandler(UsuarioException.class)
+    public ResponseEntity<ApiErrorResponse> handle(UsuarioException ex) {
         final ApiErrorResponse apiErrorResponse = new ApiErrorResponse(ex.getMensaje());
         return new ResponseEntity<>(apiErrorResponse, HttpStatus.BAD_REQUEST);
     }
@@ -51,6 +45,10 @@ public class ErrorHandler {
         return new ResponseEntity<>(apiErrorResponse, HttpStatus.BAD_REQUEST);
     }
 
+    @ExceptionHandler(Throwable.class)
+    public ResponseEntity<ApiErrorResponse> handle(Throwable ex) {
+        return buildResponseError(HttpStatus.INTERNAL_SERVER_ERROR, ex);
+    }
 
     private static class ApiErrorResponse {
 

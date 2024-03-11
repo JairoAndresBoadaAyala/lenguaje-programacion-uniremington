@@ -19,20 +19,21 @@ public class UsuarioService implements IUsuarioService {
 
     public UsuarioResponse crear(Usuario usuario) {
         var usuarioRespuesta = usuarioRepository.crear(usuario);
-        return UsuarioResponse.builder().id(usuarioRespuesta.getId()).mensaje("usuario creado correctamente").build();
+        return UsuarioResponse.builder().id(usuarioRespuesta).mensaje("usuario creado correctamente").build();
     }
 
-    public UsuarioEntity consultar(String id) {
+    public UsuarioEntity consultar(Long id) {
         return usuarioRepository.consultar(id);
     }
 
+
     @Override
-    public UpdateOrDeleteResponse eliminar(String id) {
-        return usuarioRepository.eliminar(id);
+    public UpdateOrDeleteResponse actualizar(Usuario usuario, Long id) {
+        return usuarioRepository.actualizar(usuario, id);
     }
 
     @Override
-    public UpdateOrDeleteResponse actualizar(Usuario usuario, String id) {
-        return usuarioRepository.actualizar(usuario, id);
+    public UpdateOrDeleteResponse eliminar(Long id) {
+        return usuarioRepository.eliminar(id);
     }
 }

@@ -8,10 +8,10 @@ import com.example.demo.repository.entity.UsuarioEntity;
 public interface IUsuarioService {
     UsuarioResponse crear(Usuario usuario);
 
-    UsuarioEntity consultar(String id);
+    UsuarioEntity consultar(Long id);
 
-    UpdateOrDeleteResponse eliminar(String id);
+    UpdateOrDeleteResponse actualizar(Usuario usuario, Long id);
 
-    UpdateOrDeleteResponse actualizar(Usuario usuario, String id);
+    UpdateOrDeleteResponse eliminar(Long id);
 
 }

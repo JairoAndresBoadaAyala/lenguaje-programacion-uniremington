@@ -6,12 +6,12 @@ import com.example.demo.repository.entity.UsuarioEntity;
 
 public interface UsuarioRepository {
 
-    UsuarioEntity crear(Usuario usuario);
+    Long crear(Usuario usuario);
 
-    UsuarioEntity consultar(String id);
+    UsuarioEntity consultar(Long id);
 
-    UpdateOrDeleteResponse eliminar(String email);
+    UpdateOrDeleteResponse actualizar(Usuario usuario, Long id);
 
-    UpdateOrDeleteResponse actualizar(Usuario usuario, String id);
+    UpdateOrDeleteResponse eliminar(Long id);
 
 }

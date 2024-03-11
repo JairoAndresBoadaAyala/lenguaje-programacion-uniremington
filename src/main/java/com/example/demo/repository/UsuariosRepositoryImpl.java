@@ -7,77 +7,97 @@ import com.example.demo.repository.entity.UsuarioEntity;
 import com.example.demo.service.interfaces.out.UsuarioRepository;
 import org.springframework.stereotype.Repository;
 
-import java.util.ArrayList;
-import java.util.Objects;
-import java.util.UUID;
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+import javax.transaction.Transactional;
 
-
+@Transactional
 @Repository
 public class UsuariosRepositoryImpl implements UsuarioRepository {
 
 
-    ArrayList<UsuarioEntity> listaUsuario = new ArrayList<>();
+    @PersistenceContext
+    private EntityManager em;
 
     @Override
-    public UsuarioEntity crear(Usuario usuario) {
-        UsuarioEntity usuarioEntity = buildUsuario(usuario, null);
+    public Long crear(Usuario usuario) {
+        try {
+            var usuarioEntity = UsuarioEntity.builder()
+                    .name(usuario.getName())
+                    .email(usuario.getEmail())
+                    .password(usuario.getPassword())
+                    .build();
 
-        listaUsuario.add(usuarioEntity);
+            em.persist(usuarioEntity);
 
-        return usuarioEntity;
-    }
-
-    @Override
-    public UsuarioEntity consultar(String id) {
-
-        return listaUsuario.stream()
-                .filter(r -> Objects.equals(id, r.getId()))
-                .findFirst()
-                .orElseThrow(() -> new UsuarioException("No se encontro usuario para actualizar"));
-
-    }
-
-    @Override
-    public UpdateOrDeleteResponse eliminar(String id) {
-        var consulta = listaUsuario.stream()
-                .filter(r -> Objects.equals(id, r.getId()))
-                .findFirst()
-                .orElseThrow(() -> new UsuarioException("No se encontro usuario para eliminar"));
-        var remove = listaUsuario.remove(consulta);
-        if (remove) {
-            return UpdateOrDeleteResponse.builder().mensaje("usuario con id " + id + "eliminado correctamente").build();
-        } else {
-            return UpdateOrDeleteResponse.builder().mensaje("no fue posible elimiar el usuario" + id).build();
+            return usuarioEntity.getId();
+        } catch (Exception e) {
+            throw new UsuarioException("ha ocurrido un error insertando el usuario :  {}" + e.getCause().toString());
         }
     }
 
     @Override
-    public UpdateOrDeleteResponse actualizar(Usuario usuario, String id) {
-        var consulta = listaUsuario.stream()
-                .filter(r -> Objects.equals(id, r.getId()))
-                .findFirst()
-                .orElseThrow(() -> new UsuarioException("No se encontro usuario para actualizar"));
-        var remove = listaUsuario.remove(consulta);
-        if (remove) {
-            listaUsuario.add(buildUsuario(usuario, id));
-            return UpdateOrDeleteResponse.builder().mensaje("usuario con id " + id + "actualizado correctamente").build();
-        } else {
-            return UpdateOrDeleteResponse.builder().mensaje("no fue posible actualizar el usuario" + id).build();
+    public UsuarioEntity consultar(Long id) {
+        try {
+            var usuarioEntidad = (em.find(UsuarioEntity.class, id));
+
+            if(usuarioEntidad != null) {
+                return usuarioEntidad;
+            } else {
+                throw new UsuarioException("el usuario con id : " + id + "no existe");
+            }
+
+        } catch (Exception e) {
+            throw new UsuarioException("ha ocurrido un error consultando el usuario : " + id + e.getCause().toString());
         }
     }
 
 
-    private UsuarioEntity buildUsuario(Usuario usuario, String id) {
-        String idOrNew = "";
-        if (id != null) {
-            idOrNew = id;
-        } else {
-            idOrNew = UUID.randomUUID().toString();
+    @Override
+    public UpdateOrDeleteResponse actualizar(Usuario usuario, Long id) {
+
+        try {
+            var usuarioEntity = em.find(UsuarioEntity.class, id);
+
+            if (usuarioEntity != null) {
+                usuarioEntity.setName(buildValue(usuario.getName(), usuarioEntity.getName()));
+                usuarioEntity.setEmail(buildValue(usuario.getEmail(), usuarioEntity.getEmail()));
+                usuarioEntity.setPassword(buildValue(usuario.getPassword(), usuarioEntity.getPassword()));
+
+                em.merge(usuarioEntity);
+                return UpdateOrDeleteResponse.builder()
+                        .mensaje("usuario actualizado correctamente")
+                        .build();
+            } else {
+                throw new UsuarioException("el usuario con id  : " + id + "no existe");
+            }
+        } catch (Exception e) {
+            throw new UsuarioException("ha ocurrido un error actualizando el usuario : " + id + e.getCause().toString());
         }
-        return UsuarioEntity.builder()
-                .id(idOrNew)
-                .name(usuario.getName())
-                .email(usuario.getEmail())
-                .password(usuario.getPassword()).build();
+
+    }
+
+   @Override
+    public UpdateOrDeleteResponse eliminar(Long id) {
+       try {
+           var usuarioEntity = em.find(UsuarioEntity.class, id);
+
+           if (usuarioEntity != null) {
+               em.remove(usuarioEntity);
+               return UpdateOrDeleteResponse.builder()
+                       .mensaje("usuario Eliminado correctamente")
+                       .build();
+           } else {
+               throw new UsuarioException("el usuario con id  : " + id + "no existe");
+           }
+       } catch (Exception e) {
+           throw new UsuarioException("ha ocurrido un error eliminando el usuario : " + id + e.getCause().toString());
+       }
+    }
+
+    private String buildValue(String valorRequest, String valorBd) {
+
+        return (valorRequest == null) ? valorBd : valorRequest;
+
     }
 }

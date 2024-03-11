@@ -19,25 +19,24 @@ public class UsuarioController {
         this.usuarioService = usuarioService;
     }
 
-
     @PostMapping()
     public UsuarioResponse crearUsuario(@Valid @RequestBody Usuario usuario) {
         return usuarioService.crear(usuario);
     }
 
     @GetMapping("/{id}")
-    public final UsuarioEntity obtenerUsuario(@PathVariable("id") String id) {
+    public final UsuarioEntity obtenerUsuario(@PathVariable("id") Long id) {
         return usuarioService.consultar(id);
     }
 
-    @DeleteMapping("/{id}")
-    public final UpdateOrDeleteResponse eliminarUsuario(@PathVariable("id") String id) {
-        return usuarioService.eliminar(id);
+    @PutMapping("/{id}")
+    public final UpdateOrDeleteResponse actualizarUsuario(@Valid @RequestBody Usuario usuario, @PathVariable("id") Long id) {
+        return usuarioService.actualizar(usuario, id);
     }
 
-    @PutMapping("/{id}")
-    public final UpdateOrDeleteResponse actualizarUsuario(@Valid @RequestBody Usuario usuario, @PathVariable("id") String id) {
-        return usuarioService.actualizar(usuario, id);
+    @DeleteMapping("/{id}")
+    public final UpdateOrDeleteResponse eliminarUsuario(@PathVariable("id") Long id) {
+        return usuarioService.eliminar(id);
     }
 }
 

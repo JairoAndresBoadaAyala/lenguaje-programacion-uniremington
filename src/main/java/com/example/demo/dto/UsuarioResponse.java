@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
 @Builder
 public class UsuarioResponse {
 
-    String id;
+    Long id;
     String mensaje;
 
 }
