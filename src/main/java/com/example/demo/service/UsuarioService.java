@@ -1,0 +1,38 @@
+package com.example.demo.service;
+
+import com.example.demo.dto.UpdateOrDeleteResponse;
+import com.example.demo.dto.Usuario;
+import com.example.demo.dto.UsuarioResponse;
+import com.example.demo.repository.entity.UsuarioEntity;
+import com.example.demo.service.interfaces.in.IUsuarioService;
+import com.example.demo.service.interfaces.out.UsuarioRepository;
+import org.springframework.stereotype.Service;
+
+@Service
+public class UsuarioService implements IUsuarioService {
+
+    private final UsuarioRepository usuarioRepository;
+
+    public UsuarioService(UsuarioRepository usuarioRepository) {
+        this.usuarioRepository = usuarioRepository;
+    }
+
+    public UsuarioResponse crear(Usuario usuario) {
+        var usuarioRespuesta = usuarioRepository.crear(usuario);
+        return UsuarioResponse.builder().id(usuarioRespuesta.getId()).mensaje("usuario creado correctamente").build();
+    }
+
+    public UsuarioEntity consultar(String id) {
+        return usuarioRepository.consultar(id);
+    }
+
+    @Override
+    public UpdateOrDeleteResponse eliminar(String id) {
+        return usuarioRepository.eliminar(id);
+    }
+
+    @Override
+    public UpdateOrDeleteResponse actualizar(Usuario usuario, String id) {
+        return usuarioRepository.actualizar(usuario, id);
+    }
+}
